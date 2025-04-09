@@ -1,8 +1,11 @@
 [package]
-name = "layout-aware-search"
+name = "permissive-search"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-crossterm = "0.29"
 sort-const = "1"
+
+[lints.clippy]
+pedantic = "warn"
+nursery = "warn"
