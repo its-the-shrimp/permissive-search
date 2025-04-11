@@ -1,4 +1,4 @@
-mod lookalikes;
+pub mod lookalikes;
 
 use std::mem::swap;
 
@@ -24,7 +24,6 @@ impl<'key> FromIterator<(usize, &'key str)> for SearchTree {
 
 impl SearchTree {
     /// Get an immediate child node associated with the provided character.
-    #[must_use]
     pub fn get(&self, index: char) -> Option<&Self> {
         self.nodes
             .binary_search_by_key(&index, |(ch, _)| *ch)
@@ -86,7 +85,6 @@ impl Extend<char> for Searcher<'_> {
 
 impl<'tree> Searcher<'tree> {
     /// Create a searcher through a tree with `root` as its root.
-    #[must_use]
     pub fn new(root: &'tree SearchTree) -> Self {
         Self {
             root,
@@ -94,6 +92,14 @@ impl<'tree> Searcher<'tree> {
             considered: vec![root],
             new: vec![],
         }
+    }
+
+    pub const fn root(&self) -> &'tree SearchTree {
+        self.root
+    }
+
+    pub fn input(&self) -> &str {
+        self.input.as_str()
     }
 
     /// Push a character into the searched string
@@ -117,11 +123,15 @@ impl<'tree> Searcher<'tree> {
                     .flat_map(|n| misclicks.clone().filter_map(|ch| n.get(ch))),
             ),
         );
-        swap(new, considered);
+
+        if !new.is_empty() {
+            swap(new, considered);
+        }
+       
     }
 
     /// Remove the last character from the searched string, if present.
-    fn pop(&mut self) {
+    pub fn pop(&mut self) {
         if self.input.pop().is_none() {
             return;
         }
