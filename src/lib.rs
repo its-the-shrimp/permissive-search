@@ -25,6 +25,10 @@ impl<'key> FromIterator<(usize, &'key str)> for SearchTree {
 impl SearchTree {
     /// Get an immediate child node associated with the provided character.
     pub fn get(&self, index: char) -> Option<&Self> {
+        if self.nodes.last().is_none_or(|(last, _)| index > *last) {
+            return None;
+        }
+
         self.nodes
             .binary_search_by_key(&index, |(ch, _)| *ch)
             .ok()
@@ -127,7 +131,6 @@ impl<'tree> Searcher<'tree> {
         if !new.is_empty() {
             swap(new, considered);
         }
-       
     }
 
     /// Remove the last character from the searched string, if present.

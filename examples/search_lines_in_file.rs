@@ -64,7 +64,7 @@ fn inner_main() -> Result<(), Box<dyn Error>> {
             KeyCode::Backspace => {
                 stdout
                     .execute(MoveToColumn(
-                        (PROMPT.len() + searcher.input().len()) as u16 - 1,
+                        (PROMPT.len() + searcher.input().chars().count()) as u16 - 1,
                     ))?
                     .execute(Clear(UntilNewLine))?
                     .flush()?;
@@ -93,7 +93,9 @@ fn inner_main() -> Result<(), Box<dyn Error>> {
         })?;
         stdout
             .execute(MoveToPreviousLine(lines_printed + 1))?
-            .execute(MoveToColumn((PROMPT.len() + searcher.input().len()) as u16))?
+            .execute(MoveToColumn(
+                (PROMPT.len() + searcher.input().chars().count()) as u16,
+            ))?
             .flush()?;
     }
 
