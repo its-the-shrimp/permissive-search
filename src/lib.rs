@@ -114,7 +114,7 @@ impl<'tree> Searcher<'tree> {
         new: &mut Vec<&'tree SearchTree>,
         ch: char,
     ) {
-        let misclicks = lookalikes::qwerty_misclicks(ch);
+        let misclicks = lookalikes::all(ch);
         new.clear();
         new.extend(
             considered.iter().filter_map(|n| n.get(ch)).chain(
