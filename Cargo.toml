@@ -2,6 +2,12 @@
 name = "permissive-search"
 version = "0.1.0"
 edition = "2024"
+authors = ["Tim Kurdov <tim.kurdov@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/its-the-shrimp/permissive-search"
+description = "Implementing user-friendly search interfaces in Rust, no-std"
+categories = ["algorithms", "data-structures", "no-std"]
+keywords = ["search-algorithms"]
 
 [dev-dependencies]
 crossterm = "0.29"
@@ -9,6 +15,6 @@ crossterm = "0.29"
 [lints.clippy]
 pedantic = { level = "warn", priority = -1 }
 nursery = { level = "warn", priority = -1 }
-
+alloc_instead_of_core = "warn"
 must_use_candidate = "allow"
 cast_possible_truncation = "allow"

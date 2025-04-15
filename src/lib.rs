@@ -1,6 +1,13 @@
+#![no_std]
+
+extern crate alloc;
+
 pub mod lookalikes;
 
-use std::mem::swap;
+use {
+    alloc::{string::String, vec, vec::Vec},
+    core::mem::swap,
+};
 
 /// A tree that associates a string key with an `usize` index.
 ///
