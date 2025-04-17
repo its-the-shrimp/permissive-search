@@ -1,3 +1,5 @@
+//! Functions that return iterators over similar characters.
+
 /// Returns `(row, col)`
 const fn find_char<const N_ROWS: usize, const N_COLS: usize>(
     ch: char,
@@ -18,7 +20,7 @@ const fn find_char<const N_ROWS: usize, const N_COLS: usize>(
     None
 }
 
-/// Returns all characters that `ch` could've been a misclick of.
+/// All characters that `ch` could've been a misclick of.
 ///
 /// E.g. if the user typed in `a`, it could mean that they meant `a`, or (assuming their keybaord
 /// is in the QWERTY layout) they've misclicked one of the following: `q`, `w`, `s`, `x`, `z`
@@ -123,6 +125,8 @@ pub fn qwerty_misclicks(ch: char) -> impl Iterator<Item = char> + Clone {
         .filter(|c| *c != '\0')
 }
 
+/// All variants of `ch`, e.g. the base letter with diacritics.
+///
 /// The returned iterator variants of `ch` with diacritics, variants of other registers (except for
 /// case), e.g. for a base Katakana character, yields its variants in Hiragana, with Dakuten &
 /// Handakuten.

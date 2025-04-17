@@ -1,3 +1,8 @@
+//! # Get your search bar right.
+//!
+//! `permissive-search` provides a set of utilities for implementing search interfaces. Check out
+//! the examples in the repo.
+
 #![no_std]
 
 extern crate alloc;
@@ -10,9 +15,6 @@ use {
 };
 
 /// A tree that associates a string key with an `usize` index.
-///
-/// The tree structure allows for a more optimised search that allows suspending the search, e.g.
-/// while user input is pending.
 #[derive(Debug, Default)]
 pub struct SearchTree {
     nodes: Vec<(char, SearchTree)>,
@@ -77,6 +79,7 @@ impl SearchTree {
     }
 }
 
+/// Storage for the state of a search through a [`SearchTree`]
 pub struct Searcher<'tree> {
     root: &'tree SearchTree,
     input: String,
