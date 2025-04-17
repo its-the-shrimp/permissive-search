@@ -10,7 +10,7 @@ extern crate alloc;
 pub mod lookalikes;
 
 use {
-    alloc::{string::String, vec, vec::Vec},
+    alloc::{boxed::Box, string::String, vec, vec::Vec},
     core::mem::swap,
 };
 
@@ -79,7 +79,7 @@ impl SearchTree {
     }
 }
 
-/// Storage for the state of a search through a [`SearchTree`]
+/// Storage for the state of a search through a [`SearchTree`].
 pub struct Searcher<'tree> {
     root: &'tree SearchTree,
     input: String,
@@ -87,6 +87,10 @@ pub struct Searcher<'tree> {
     considered: Vec<&'tree SearchTree>,
     /// To be swapped with `considered` after every char input
     new: Vec<&'tree SearchTree>,
+    /// Temporary buffer for similar chars gathered from `lookalike_gen`
+    lookalikes_buf: Vec<char>,
+    #[allow(clippy::type_complexity, reason = "it's not lol")]
+    lookalike_gen: Box<dyn FnMut(char, &mut Vec<char>)>,
 }
 
 impl Extend<char> for Searcher<'_> {
@@ -98,13 +102,32 @@ impl Extend<char> for Searcher<'_> {
 }
 
 impl<'tree> Searcher<'tree> {
-    /// Create a searcher through a tree with `root` as its root.
-    pub fn new(root: &'tree SearchTree) -> Self {
+    /// Create a new searcher.
+    /// - `root` is the root of the tree to be searched.
+    /// - `iter_gen` is the function that returns an iterator over characters similar to the input one.
+    ///
+    /// The definition of similarity is defined by `iter_gen`.
+    ///
+    /// # Example
+    /// ```rust
+    /// // An example of creating a `Searcher` that only accounts for QWERTY misclicks.
+    /// use permissive_search::*;
+    ///
+    /// # let root = SearchTree::default();
+    /// let searcher = Searcher::new(&root, lookalikes::qwerty_misclicks);
+    /// # _ = searcher;
+    /// ```
+    pub fn new<I: Iterator<Item = char>>(
+        root: &'tree SearchTree,
+        mut iter_gen: impl 'static + FnMut(char) -> I,
+    ) -> Self {
         Self {
             root,
             input: String::new(),
             considered: vec![root],
             new: vec![],
+            lookalikes_buf: vec![],
+            lookalike_gen: Box::new(move |ch, dst| dst.extend(iter_gen(ch))),
         }
     }
 
@@ -119,23 +142,32 @@ impl<'tree> Searcher<'tree> {
     /// Push a character into the searched string
     pub fn push(&mut self, ch: char) {
         self.input.push(ch);
-        Self::compute_considerations(&mut self.considered, &mut self.new, ch);
+        Self::compute_considerations(
+            ch,
+            &mut self.lookalikes_buf,
+            &mut self.lookalike_gen,
+            &mut self.considered,
+            &mut self.new,
+        );
     }
 
     /// Common impl for [`Searcher::push`] & [`Searcher::pop`]
     fn compute_considerations(
+        ch: char,
+        lookalikes_buf: &mut Vec<char>,
+        lookalike_gen: &mut dyn FnMut(char, &mut Vec<char>),
         considered: &mut Vec<&'tree SearchTree>,
         new: &mut Vec<&'tree SearchTree>,
-        ch: char,
     ) {
-        let misclicks = lookalikes::all(ch);
+        lookalikes_buf.clear();
+        lookalikes_buf.push(ch);
+        lookalike_gen(ch, lookalikes_buf);
+
         new.clear();
         new.extend(
-            considered.iter().filter_map(|n| n.get(ch)).chain(
-                considered
-                    .iter()
-                    .flat_map(|n| misclicks.clone().filter_map(|ch| n.get(ch))),
-            ),
+            considered
+                .iter()
+                .flat_map(|n| lookalikes_buf.iter().filter_map(|&ch| n.get(ch))),
         );
 
         if !new.is_empty() {
@@ -151,7 +183,13 @@ impl<'tree> Searcher<'tree> {
         self.considered.clear();
         self.considered.push(self.root);
         for ch in self.input.chars() {
-            Self::compute_considerations(&mut self.considered, &mut self.new, ch);
+            Self::compute_considerations(
+                ch,
+                &mut self.lookalikes_buf,
+                &mut self.lookalike_gen,
+                &mut self.considered,
+                &mut self.new,
+            );
         }
     }
 

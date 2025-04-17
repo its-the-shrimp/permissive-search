@@ -10,7 +10,7 @@ use {
             ScrollUp, disable_raw_mode, enable_raw_mode,
         },
     },
-    permissive_search::{SearchTree, Searcher},
+    permissive_search::{SearchTree, Searcher, lookalikes},
     std::{
         env::args_os,
         error::Error,
@@ -36,7 +36,7 @@ fn inner_main() -> Result<(), Box<dyn Error>> {
         .map_err(|e| format!("Failed to read the contents of {filename:?}: {e}"))?;
 
     let root: SearchTree = lines.iter().map(Deref::deref).enumerate().collect();
-    let mut searcher = Searcher::new(&root);
+    let mut searcher = Searcher::new(&root, lookalikes::all);
 
     enable_raw_mode()?;
     let mut stdout = stdout().lock();
