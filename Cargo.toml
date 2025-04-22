@@ -5,7 +5,7 @@ edition = "2024"
 authors = ["Tim Kurdov <tim.kurdov@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/its-the-shrimp/permissive-search"
-description = "Implementing user-friendly search interfaces in Rust, no-std"
+description = "Implementing user-friendly search interfaces in Rust. no-std. Zero dependencies."
 categories = ["algorithms", "data-structures", "no-std"]
 keywords = ["search-algorithms"]
 

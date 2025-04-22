@@ -11,7 +11,7 @@ Namely, it must permit:
 - Omtted characers
 - Misvlickw
 - Extera charazxcters
-- Missing diacritics
+- Mıssıng dıacrıtıcs
 
 On the video above, I tried to select the Hungarian language by typing out its name in the English & in the Portuguese interfaces,
 the latter is included to showcase how bad search bars mishandle diacritics. As you can see, even 1 mistake is enough for
